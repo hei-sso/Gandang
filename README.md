@@ -1,4 +1,4 @@
-## `터미널 명령어 모음`
+## `npm 명령어 모음`
 
 ### `npm start`
 
@@ -23,6 +23,8 @@ Firebase를 설치합니다.
 ### `npm install -g firebase-tools`
 
 Firebase 명령줄 도구(CLI Tools)를 설치(global)합니다.
+
+## `firebase 명령어 모음`
 
 ### `firebase login`
 
