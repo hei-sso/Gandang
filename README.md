@@ -14,13 +14,11 @@
 React가 프로덕션 모드로 올바르게 번들링되고, 최상의 성능을 위해 빌드가 최적화됩니다.
 
 빌드는 최소화(minify) 되어 있으며, 파일 이름에는 해시값이 포함됩니다.\
-이제 앱을 배포할 준비가 완료되었습니다!
-
 자세한 내용은 배포 관련 문서[deployment](https://facebook.github.io/create-react-app/docs/deployment)를 참고하세요.
 
 ### `npm install firebase`
 
-firebase를 설치합니다.
+Firebase를 설치합니다.
 
 ### `npm install -g firebase-tools`
 
