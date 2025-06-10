@@ -4,17 +4,40 @@
   flex-direction: column;
   min-height: 100vh;
 }
+/* 기존 .container는 그대로 두고 내부에 form-layout 추가 */
+.form-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.form-section,
+.survey-section {
+  flex: 1;
+  min-width: 350px;
+}
+
+/* 반응형 대응 */
+@media (max-width: 768px) {
+  .form-layout {
+    flex-direction: column;
+  }
+}
 
 .header {
   padding: 20px;
   background-color: #f0f0f0;
-  text-align: left;
+  display: flex;              /* 추가: 가로 배치 */
+  justify-content: space-between; /* 양쪽 정렬 */
+  align-items: center;       /* 세로 중앙 정렬 */
 }
 
 .logo {
-  font-size: 30px;
-  font-weight: bold;
-  margin: 0;
+  height: 80px; /* 로고 크기 조절 */
+  margin-right: 1rem;
 }
 
 .nav {
@@ -22,7 +45,7 @@
 }
 
 .navItem {
-  margin-right: 15px;
+  margin-right: 20px;
   text-decoration: none;
   color: #333;
   font-size: 18px;
@@ -48,7 +71,7 @@
   margin-top: 20px;
   padding: 12px 24px;
   font-size: 16px;
-  background-color: #4CAF50;
+  background-color: #d62e25;
   color: white;
   border: none;
   border-radius: 5px;
