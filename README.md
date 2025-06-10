@@ -18,6 +18,14 @@ React가 프로덕션 모드로 올바르게 번들링되고, 최상의 성능�
 
 자세한 내용은 배포 관련 문서[deployment](https://facebook.github.io/create-react-app/docs/deployment)를 참고하세요.
 
+### `npm install firebase`
+
+firebase를 설치합니다.
+
+### `npm install -g firebase-tools`
+
+Firebase 명령줄 도구(CLI Tools)를 설치(global)합니다.
+
 ### `firebase login`
 
 Firebase에 로그인합니다.\
