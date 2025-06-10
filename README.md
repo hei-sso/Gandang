@@ -1,70 +1,48 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
 ### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+개발 모드에서 앱을 실행시킵니다.\
+[http://localhost:3000](http://localhost:3000)로 브라우저에서 열립니다.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+변경을 하면 페이지가 새로 고쳐집니다.\
+또한 콘솔에서 오류를 확인할 수 있습니다.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+앱을 build 폴더에 프로덕션 용도로 빌드합니다.\
+React가 프로덕션 모드로 올바르게 번들링되고, 최상의 성능을 위해 빌드가 최적화됩니다.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+빌드는 최소화(minify) 되어 있으며, 파일 이름에는 해시값이 포함됩니다.\
+이제 앱을 배포할 준비가 완료되었습니다!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+자세한 내용은 배포 관련 문서[deployment](https://facebook.github.io/create-react-app/docs/deployment)를 참고하세요.
 
-### `npm run eject`
+### `firebase login`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Firebase에 로그인합니다.\
+Firebase CLI를 사용하기 위해 Google 계정으로 인증을 수행합니다.\
+로그인 후 현재 계정이 연결된 Firebase 프로젝트에 접근할 수 있게 됩니다.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### `firebase init`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Firebase CLI를 초기화하고 프로젝트를 설정합니다.\
+Hosting, Firestore, Authentication, Functions 등 원하는 Firebase 서비스들을 선택하여 프로젝트에 연결할 수 있습니다.\
+초기화 후 .firebaserc, firebase.json 등의 설정 파일이 생성됩니다.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### `firebase deploy --only hosting`
 
-## Learn More
+Firebase Hosting만 선택적으로 배포합니다.\
+앱 전체가 아닌 정적 웹 자산(HTML, CSS, JS 등) 만 배포할 때 사용합니다.\
+프론트엔드 코드만 바뀐 경우 빠르게 업데이트할 수 있으며, 콘솔에 미리보기(previews) URL도 제공됩니다.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### `firebase deploy --only database`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Firestore의 규칙/데이터만 배포합니다.\
+보안 규칙 또는 초기 데이터 세팅을 업데이트할 때 사용되며, 다른 서비스(Hosting 등)는 건드리지 않습니다.
 
-### Code Splitting
+### `firebase deploy`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+build 폴더 안의 정적 파일들을 Firebase에 업로드합니다.\
+업로드 후, 누구나 접속할 수 있는 웹사이트로 호스팅됩니다.
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+성공적으로 배포되면, 명령어 실행 후 배포된 URL이 콘솔에 출력됩니다.\
+이제 실제 사용자가 브라우저에서 앱을 사용할 수 있습니다!
