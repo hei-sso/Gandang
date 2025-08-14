@@ -1,5 +1,5 @@
 export async function getCoordsFromAddress(address) {
-  const REST_API_KEY = 'Kakao_API_키 입력';
+  const REST_API_KEY = process.env.REACT_APP_Kakao_API_KEY;
   const url = `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`;
 
   try {
