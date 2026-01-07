@@ -1,7 +1,7 @@
 # GandangGandang 간당간당
 
 <div align="center">
-  <img src="https://github.com/hei-sso/Gandang/blob/main/src/assets/logo.png" alt="GandangGandang Logo" />
+  <img src="https://github.com/hei-sso/Gandang/blob/main/src/assets/logo.png" alt="GandangGandang Logo" width="300" />
 </div>
 <br>
 
