@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
-import Modal from './Modal'; // Modal 컴포넌트 import
+import { useNavigate } from 'react-router-dom';
+import Modal from './Modal';
+import { getDistanceFromSurvey } from '../api/directionUtils';
+import { fetchDailyWeatherData } from '../api/weatherUtils';
+import { fetchAndSaveTrafficData } from '../api/trafficUtils';
+import { predictWithSurvey } from '../TensorFlow/Model';
 
 // Firestore 관련 코드
-//import { db } from './firebase'; // 실제 연동 시 Firebase import 해야함
-//import { doc, getDoc, setDoc } from '.firebase/firestore';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 function Predict() {
+  const navigate = useNavigate(); // 페이지 이동용
   // 설문조사 상태
   const [survey, setSurvey] = useState({
     location_user: '',
@@ -33,24 +39,70 @@ function Predict() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal 상태
   const [modalType, setModalType] = useState(''); // 'fetch' 또는 'save'에 따라 다른 팝업 띄우기
 
-  // Firestore에서 데이터 불러오기
   const fetchData = async (id) => {
-    // 주석으로 firestore 연동 코드 추가
-    // const docRef = doc(db, 'surveys', id);
-    // const docSnap = await getDoc(docRef);
-    // if (docSnap.exists()) {
-    //   setSurvey(docSnap.data());
-    alert(`고유 ID ${id}의 데이터를 불러왔습니다.`);
-    // } else {
-    //   alert('ID에 해당하는 데이터가 없습니다.');
-    // }
+    try {
+      const docRef = doc(db, 'survey', id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+
+        // survey 객체에 필요한 필드만 추출해서 업데이트
+        setSurvey({
+          location_user: data.location_user || '',
+          location_school: data.location_school || '',
+          transport_mode: String(data.transport_mode ?? ''),
+          semester_elective: String(data.semester_elective ?? '0'),
+          semester_major: String(data.semester_major ?? '0'),
+          num_late_arrivals: String(data.num_late_arrivals ?? ''),
+          avg_sleep_duration: String(data.avg_sleep_duration ?? ''),
+          has_part_time: data.has_part_time ? '1' : '0',
+          part_time_affects: data.part_time_affects ? '1' : '0',
+        });
+
+        setFirstClassByDay({
+          mon: String(data.first_class_mon ?? ''),
+          tue: String(data.first_class_tue ?? ''),
+          wed: String(data.first_class_wed ?? ''),
+          thur: String(data.first_class_thur ?? ''),
+          fri: String(data.first_class_fri ?? ''),
+        });
+
+        alert(`고유 ID ${id}의 데이터를 불러왔습니다.`);
+      } else {
+        alert('ID에 해당하는 데이터가 없습니다.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('데이터 불러오기 중 오류가 발생했습니다.');
+    }
   };
 
   // Firestore에 데이터 저장
-  const saveData = async () => {
-    // 주석으로 firestore 연동 코드 추가
-    // await setDoc(doc(db, 'surveys', uniqueId), survey);
-  };
+  const saveData = async (id) => {
+  try {
+    await setDoc(doc(db, 'survey', id), {
+      location_user: survey.location_user,
+      location_school: survey.location_school,
+      transport_mode: Number(survey.transport_mode),
+      semester_elective: Number(survey.semester_elective),
+      semester_major: Number(survey.semester_major),
+      num_late_arrivals: Number(survey.num_late_arrivals),
+      avg_sleep_duration: Number(survey.avg_sleep_duration),
+      has_part_time: survey.has_part_time === '1',
+      part_time_affects: survey.part_time_affects === '1',
+      first_class_mon: Number(firstClassByDay.mon),
+      first_class_tue: Number(firstClassByDay.tue),
+      first_class_wed: Number(firstClassByDay.wed),
+      first_class_thur: Number(firstClassByDay.thur),
+      first_class_fri: Number(firstClassByDay.fri),
+      distance_km: null,
+      weather: null,
+      temperature: null,
+    });
+  } catch (error) {
+    alert('데이터 저장 중 오류가 발생했습니다.');
+  }
+};
 
   // Modal에서 확인 버튼 클릭 시
   const handleModalConfirm = async (id) => {
@@ -59,9 +111,23 @@ function Predict() {
     if (modalType === 'fetch') {
       await fetchData(id); // 고유 ID로 데이터 불러오기
     } else if (modalType === 'save') {
-      generateUniqueId(); // 팝업에서 확인 클릭 시 고유 ID 생성
       alert(`설문 데이터가 고유 ID ${id}로 저장되었습니다.\n현재 이 팝업을 캡처하여 고유 ID를 보관하여 주십시오.`); // 알림 한 번만 띄움
-      await saveData(id); // 데이터 저장
+
+      await saveData(id); // 1. 설문 데이터 저장
+
+      const docRef = doc(db, 'survey', id);
+      const docSnap = await getDoc(docRef);
+      const data = docSnap.data();
+      const address = data.location_user;
+      
+      // 2. 거리 계산 및 저장
+      await getDistanceFromSurvey(id); 
+
+      // 3. 날씨/온도 계산 및 저장 (사용자 주소 기준)
+      await fetchDailyWeatherData(survey.location_user, id);
+
+      // 4. 교통 정보 저장
+      await fetchAndSaveTrafficData(id, data.location_user, data.location_school);
     }
   };
 
@@ -74,12 +140,6 @@ function Predict() {
   // Modal 닫기
   const handleModalClose = () => {
     setIsModalOpen(false);
-  };
-
-  // 고유 ID 생성 함수
-  const generateUniqueId = () => {
-    const id = (Date.now() + Math.random().toString(36).substring(2, 12)).slice(0, 10);
-    setUniqueId(id);
   };
 
   // 우편번호 찾기
@@ -119,16 +179,36 @@ function Predict() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 고유 ID가 없으면 알림 띄우고, 저장 버튼을 눌러 ID를 생성하도록 유도
     if (!uniqueId) {
       alert('고유 ID가 생성되지 않았습니다. 저장 버튼을 눌러주세요.');
-      return; // 예측 시작을 하지 않음
+      return;
     }
-    // 고유 ID가 있으면 예측 진행
-    alert(`예측이 시작됩니다. 고유 ID: ${uniqueId}`);
+
+    alert(`예측을 시작합니다. 고유 ID: ${uniqueId}`);
+
+    try {
+      const result = await predictWithSurvey(uniqueId); // 객체 형태로 받음
+
+      if (result) {
+        navigate('/result', {
+          state: {
+            userId: uniqueId,
+            probability: result.probability,
+            predictedClass: result.predictedClass,
+            congested: result.congested,
+            distance_km: result.distance_km,
+          },
+        });
+      } else {
+        alert('예측에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('예측 중 오류:', error);
+      alert('예측 중 오류가 발생했습니다.');
+    }
   };
 
   // 인라인 스타일

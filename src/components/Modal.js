@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Modal 컴포넌트
 function Modal({ isOpen, onClose, onConfirm, modalType, title, message, uniqueId, setUniqueId }) {
   const [inputId, setInputId] = useState(uniqueId || ''); // 고유 ID 상태
+
+  // 🔥 외부에서 uniqueId가 바뀌면 inputId에도 반영
+  useEffect(() => {
+    if (modalType === 'fetch') {
+      setInputId('');
+    } else if (modalType === 'save' && uniqueId) {
+      setInputId(uniqueId);
+    }
+  }, [uniqueId, modalType]);
 
   const handleConfirm = () => {
     if (modalType === 'fetch' && inputId.trim() === '') {
@@ -12,22 +21,41 @@ function Modal({ isOpen, onClose, onConfirm, modalType, title, message, uniqueId
 
     // 확인 버튼의 기능을 modalType에 맞게 분기
     if (modalType === 'fetch') {
-      onConfirm(inputId); // 고유 ID로 Firestore에서 데이터 불러오기
+      setUniqueId(inputId); // 고유 ID로 Firestore에서 데이터 불러오기
+      onConfirm(inputId);
     }
 
     if (modalType === 'save') {
-      const newUniqueId = generateUniqueId();
-      setUniqueId(newUniqueId); // 고유 ID 생성
-      onConfirm(newUniqueId); // Firestore에 데이터 저장
+      const idToUse = uniqueId || generateUniqueId(); // 기존 ID가 있으면 그걸 사용
+      setUniqueId(idToUse); // 상태에도 반영
+      onConfirm(idToUse);   // 해당 ID로 저장
     }
 
-    onClose(); // 팝업 닫기
+    onClose();  // 팝업 닫기
   };
 
   const generateUniqueId = () => {
-    const id = (Date.now() + Math.random().toString(36).substring(2, 12)).slice(0, 10);
-    return id;
-  };
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+  let id = '';
+  let digitCount = 0;
+
+  while (true) {
+    id = '';
+    digitCount = 0;
+
+    for (let i = 0; i < 10; i++) {
+      const char = chars.charAt(Math.floor(Math.random() * chars.length));
+      if (/\d/.test(char)) digitCount++;
+      id += char;
+    }
+
+    if (digitCount >= 3) break; // 숫자가 3개 이상이면 종료
+  }
+
+  return id;
+};
+
 
   if (!isOpen) return null;
 
@@ -42,6 +70,12 @@ function Modal({ isOpen, onClose, onConfirm, modalType, title, message, uniqueId
               type="text"
               value={inputId}
               onChange={(e) => setInputId(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleConfirm();
+                }
+              }}
               placeholder="고유 ID를 입력해 주세요"
               style={inputStyle}
             />
@@ -102,7 +136,7 @@ const modalButtonContainer = {
 const modalButtonStyle = {
   padding: '10px 20px',
   margin: '0 10px',
-  backgroundColor: '#424242',  //모달 버튼 색상 여기 있음!!!!!!!!!!!!!!!!!
+  backgroundColor: '#424242',  //모달 버튼 색상 여기 있음!
   color: 'white',
   border: 'none',
   borderRadius: '5px',
