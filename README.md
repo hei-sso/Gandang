@@ -14,6 +14,13 @@
 - Firestore를 통한 데이터 저장 및 관리
 - 직관적인 웹 인터페이스
 
+## 📦 기술 스택
+- **Frontend**: React, JavaScript
+- **Backend/Server**: Firebase (Firestore, Cloud Functions, Hosting), REST API
+- **AI/ML**: TensorFlow.js
+- **DB**: Firestore
+- **API**: Kakao API, TMAP API, OpenWeatherMap API
+
 ## 🚀 배포
 [간당간당 웹사이트 바로가기](https://gandang-8low.web.app/)
 
